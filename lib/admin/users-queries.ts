@@ -90,11 +90,6 @@ export async function getSiteUsers(): Promise<SiteUserRow[]> {
   const bannedIds = new Set(
     (bannedRes.data ?? []).map((b) => b.clerk_user_id),
   );
-  const bannedEmails = new Map(
-    (bannedRes.data ?? [])
-      .filter((b) => b.email)
-      .map((b) => [b.email!.toLowerCase(), b.clerk_user_id]),
-  );
 
   const rows: SiteUserRow[] = [];
 

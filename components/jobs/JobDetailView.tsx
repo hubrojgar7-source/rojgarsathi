@@ -277,11 +277,10 @@ function ContentCard({
 }
 
 function DetailRow({
-  icon,
   label,
   children,
 }: {
-  icon: string;
+  icon?: string;
   label: string;
   children: ReactNode;
 }) {

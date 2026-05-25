@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getStaffSession, requireStaff } from "./auth";
+import { getStaffSession } from "./auth";
 import {
   banClerkUser,
   deleteClerkUser,
