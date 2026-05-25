@@ -1,14 +1,24 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
+const hasClerkKeys =
+  !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
+  !!process.env.CLERK_SECRET_KEY;
+
+const clerkProxy = clerkMiddleware(async (auth, req) => {
   const path = req.nextUrl.pathname;
+
+  // Avoid recursive proxy invocation when checking ban status
+  if (path.startsWith("/api/auth/banned")) {
+    return NextResponse.next();
+  }
+
+  const { userId } = await auth();
 
   if (
     userId &&
     path !== "/banned" &&
-    !path.startsWith("/api/auth/banned")
+    !path.startsWith("/api/")
   ) {
     const checkUrl = new URL("/api/auth/banned", req.url);
     try {
@@ -26,6 +36,13 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
 });
+
+/** Next.js 16+ proxy (replaces deprecated middleware.ts). */
+export default hasClerkKeys
+  ? clerkProxy
+  : function proxy() {
+      return NextResponse.next();
+    };
 
 export const config = {
   matcher: [

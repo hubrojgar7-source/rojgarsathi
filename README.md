@@ -31,6 +31,19 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Import the repo and deploy from [Vercel](https://vercel.com).
+2. In **Project → Settings → Environment Variables**, add every variable from `.env.example` (required for production):
+   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+   - `CLERK_SECRET_KEY`
+   - `NEXT_PUBLIC_CLERK_SIGN_IN_URL` → `/sign-in`
+   - `NEXT_PUBLIC_CLERK_SIGN_UP_URL` → `/sign-up`
+   - `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` → `/`
+   - `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` → `/`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+3. Redeploy after saving env vars.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+If you see `500: MIDDLEWARE_INVOCATION_FAILED` or `MIDDLEWARE_INVOCATION_FAILED`, Clerk keys are usually missing or invalid on Vercel.
+
+Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
