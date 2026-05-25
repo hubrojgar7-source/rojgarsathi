@@ -5,9 +5,12 @@ export function isSupabaseConfigured(): boolean {
   );
 }
 
+/** Client + ClerkProvider — publishable key only. */
+export function hasClerkPublishableKey(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+}
+
+/** Server proxy / API — needs secret key too. */
 export function isClerkConfigured(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-      process.env.CLERK_SECRET_KEY,
-  );
+  return hasClerkPublishableKey() && Boolean(process.env.CLERK_SECRET_KEY);
 }

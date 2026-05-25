@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 
-import { isClerkConfigured } from "@/lib/supabase/env";
+import { hasClerkPublishableKey } from "@/lib/supabase/env";
 import "./globals.css";
 
 const inter = Inter({
@@ -33,11 +33,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const clerkKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-  const app = isClerkConfigured() && clerkKey ? (
-    <ClerkProvider publishableKey={clerkKey}>{children}</ClerkProvider>
-  ) : (
-    children
-  );
+  const app =
+    hasClerkPublishableKey() && clerkKey ? (
+      <ClerkProvider publishableKey={clerkKey}>{children}</ClerkProvider>
+    ) : (
+      children
+    );
 
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>

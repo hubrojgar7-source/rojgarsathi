@@ -3,7 +3,9 @@
 import { useAuth, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
-const hasClerk = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+import { hasClerkPublishableKey } from "@/lib/supabase/env";
+
+const hasClerk = hasClerkPublishableKey();
 
 function AuthLinks() {
   return (

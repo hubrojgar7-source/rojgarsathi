@@ -4,7 +4,11 @@ import { useAuth, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { hasClerkPublishableKey } from "@/lib/supabase/env";
+
 import { NAV_LINKS } from "./nav-links";
+
+const hasClerk = hasClerkPublishableKey();
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
@@ -25,9 +29,68 @@ function MenuIcon({ open }: { open: boolean }) {
   );
 }
 
+function MobileAuthLinks({ onNavigate }: { onNavigate: () => void }) {
+  return (
+    <div className="grid gap-2">
+      <Link
+        href="/sign-in"
+        onClick={onNavigate}
+        className="flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+      >
+        Sign in
+      </Link>
+      <Link
+        href="/sign-up"
+        onClick={onNavigate}
+        className="flex w-full items-center justify-center rounded-xl border border-blue-500 bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+      >
+        Sign up
+      </Link>
+    </div>
+  );
+}
+
+function MobileNavWithClerk({ onNavigate }: { onNavigate: () => void }) {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    return <div className="h-20 animate-pulse rounded-xl bg-slate-100" />;
+  }
+
+  if (isSignedIn) {
+    return (
+      <div className="space-y-3">
+        <Link
+          href="/post-job"
+          onClick={onNavigate}
+          className="flex w-full items-center justify-center rounded-xl border border-blue-500 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50"
+        >
+          Post a Job
+        </Link>
+        <Link
+          href="/#categories"
+          onClick={onNavigate}
+          className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+        >
+          Find Jobs
+        </Link>
+        <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+          <span className="text-sm font-medium text-slate-600">Account</span>
+          <UserButton
+            appearance={{
+              elements: { avatarBox: "h-9 w-9" },
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  return <MobileAuthLinks onNavigate={onNavigate} />;
+}
+
 export function MobileNav() {
   const [open, setOpen] = useState(false);
-  const { isSignedIn, isLoaded } = useAuth();
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -103,50 +166,10 @@ export function MobileNav() {
         </nav>
 
         <div className="border-t border-slate-100 p-4">
-          {!isLoaded ? (
-            <div className="h-20 animate-pulse rounded-xl bg-slate-100" />
-          ) : isSignedIn ? (
-            <div className="space-y-3">
-              <Link
-                href="/post-job"
-                onClick={close}
-                className="flex w-full items-center justify-center rounded-xl border border-blue-500 px-4 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50"
-              >
-                Post a Job
-              </Link>
-              <Link
-                href="/#categories"
-                onClick={close}
-                className="flex w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700"
-              >
-                Find Jobs
-              </Link>
-              <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
-                <span className="text-sm font-medium text-slate-600">Account</span>
-                <UserButton
-                  appearance={{
-                    elements: { avatarBox: "h-9 w-9" },
-                  }}
-                />
-              </div>
-            </div>
+          {hasClerk ? (
+            <MobileNavWithClerk onNavigate={close} />
           ) : (
-            <div className="grid gap-2">
-              <Link
-                href="/sign-in"
-                onClick={close}
-                className="flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-100"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/sign-up"
-                onClick={close}
-                className="flex w-full items-center justify-center rounded-xl border border-blue-500 bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700"
-              >
-                Sign up
-              </Link>
-            </div>
+            <MobileAuthLinks onNavigate={close} />
           )}
         </div>
       </div>

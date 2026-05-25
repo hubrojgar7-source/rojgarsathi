@@ -24,7 +24,7 @@ async function fetchPublishedJobs(
       .order("created_at", { ascending: false })
       .limit(limit);
 
-  let { data, error } = await baseQuery();
+  const { data, error } = await baseQuery();
 
   if (error?.message?.includes("category_id")) {
     const legacy = await supabase
@@ -73,7 +73,7 @@ export async function getPublishedJobById(
     return null;
   }
 
-  let { data, error } = await supabase
+  const { data, error } = await supabase
     .from("jobs")
     .select(JOB_SELECT_WITH_CATEGORY)
     .eq("id", id)

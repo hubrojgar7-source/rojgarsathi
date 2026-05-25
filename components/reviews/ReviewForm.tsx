@@ -3,18 +3,23 @@
 import { useActionState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 
+import { hasClerkPublishableKey } from "@/lib/supabase/env";
 import { createReview } from "@/lib/reviews/actions";
 import type { CreateReviewState } from "@/lib/reviews/types";
 
 const initial: CreateReviewState = {};
+const hasClerk = hasClerkPublishableKey();
 
 type Props = {
   onSuccess?: () => void;
   inModal?: boolean;
 };
 
-export function ReviewForm({ onSuccess, inModal = false }: Props) {
-  const { isSignedIn } = useUser();
+function ReviewFormFields({
+  onSuccess,
+  inModal = false,
+  isSignedIn,
+}: Props & { isSignedIn: boolean }) {
   const [state, action, pending] = useActionState(createReview, initial);
 
   useEffect(() => {
@@ -136,4 +141,17 @@ export function ReviewForm({ onSuccess, inModal = false }: Props) {
       </button>
     </form>
   );
+}
+
+function ReviewFormWithClerk(props: Props) {
+  const { isSignedIn } = useUser();
+  return <ReviewFormFields {...props} isSignedIn={Boolean(isSignedIn)} />;
+}
+
+export function ReviewForm(props: Props) {
+  if (!hasClerk) {
+    return <ReviewFormFields {...props} isSignedIn={false} />;
+  }
+
+  return <ReviewFormWithClerk {...props} />;
 }
