@@ -1,15 +1,16 @@
 import { createServerClient } from "@supabase/ssr";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
-export async function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    );
+import { isSupabaseConfigured } from "./env";
+
+export async function createClient(): Promise<SupabaseClient | null> {
+  if (!isSupabaseConfigured()) {
+    return null;
   }
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   const cookieStore = await cookies();
 
   return createServerClient(url, key, {
@@ -23,7 +24,7 @@ export async function createClient() {
             cookieStore.set(name, value, options),
           );
         } catch {
-          // Called from a Server Component where cookies are read-only; refresh in middleware if you use Supabase Auth.
+          // Server Component: cookies may be read-only.
         }
       },
     },

@@ -3,7 +3,36 @@
 import { useAuth, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
+const hasClerk = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+
+function AuthLinks() {
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      <Link
+        href="/sign-in"
+        className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 hover:text-blue-600"
+      >
+        Sign in
+      </Link>
+      <Link
+        href="/sign-up"
+        className="rounded-lg border border-blue-500 px-3 py-2 text-sm font-semibold text-blue-500 transition-colors hover:bg-blue-50 sm:px-4"
+      >
+        Sign up
+      </Link>
+    </div>
+  );
+}
+
 export function AuthControls() {
+  if (!hasClerk) {
+    return <AuthLinks />;
+  }
+
+  return <AuthControlsWithClerk />;
+}
+
+function AuthControlsWithClerk() {
   const { isSignedIn, isLoaded } = useAuth();
 
   if (!isLoaded) {

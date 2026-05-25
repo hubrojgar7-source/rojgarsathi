@@ -1,9 +1,9 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const hasClerkKeys =
-  !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY &&
-  !!process.env.CLERK_SECRET_KEY;
+import { isClerkConfigured } from "@/lib/supabase/env";
+
+const hasClerkKeys = isClerkConfigured();
 
 const clerkProxy = clerkMiddleware(async (auth, req) => {
   const path = req.nextUrl.pathname;
