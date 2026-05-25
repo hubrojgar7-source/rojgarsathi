@@ -31,19 +31,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 ## Deploy on Vercel
 
-1. Import the repo and deploy from [Vercel](https://vercel.com).
-2. In **Project → Settings → Environment Variables**, add every variable from `.env.example` (required for production):
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-   - `CLERK_SECRET_KEY`
-   - `NEXT_PUBLIC_CLERK_SIGN_IN_URL` → `/sign-in`
-   - `NEXT_PUBLIC_CLERK_SIGN_UP_URL` → `/sign-up`
-   - `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` → `/`
-   - `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` → `/`
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-3. Redeploy after saving env vars.
+See **[DEPLOY.md](./DEPLOY.md)** for the full checklist (env vars, Clerk domains, troubleshooting).
 
-If you see `500: MIDDLEWARE_INVOCATION_FAILED` or `MIDDLEWARE_INVOCATION_FAILED`, Clerk keys are usually missing or invalid on Vercel.
+Quick steps:
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Import [hubrojgar7-source/rojgarsathi](https://github.com/hubrojgar7-source/rojgarsathi) on [Vercel](https://vercel.com/new).
+2. Add all variables from `.env.example` under **Environment Variables**.
+3. Deploy, then add your Vercel URL in Clerk → **Domains**.
+4. Redeploy after any env change.
+
+If you see `MIDDLEWARE_INVOCATION_FAILED`, Clerk keys are missing or invalid on Vercel.

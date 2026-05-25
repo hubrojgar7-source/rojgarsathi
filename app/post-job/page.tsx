@@ -1,9 +1,11 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
+import { AuthConfigFallback } from "@/components/auth/AuthConfigFallback";
 import { Header } from "@/components/jobmatrix/Header";
 import { SiteFooter } from "@/components/jobmatrix/SiteFooter";
 import { TopBanner } from "@/components/TopBanner";
+import { isClerkConfigured } from "@/lib/supabase/env";
 import { PostJobForm } from "./post-job-form";
 
 export const metadata = {
@@ -12,6 +14,15 @@ export const metadata = {
 };
 
 export default async function PostJobPage() {
+  if (!isClerkConfigured()) {
+    return (
+      <AuthConfigFallback
+        title="Post a job unavailable"
+        description="Sign-in and job posting require Clerk keys in your deployment environment. Configure them in Vercel, then redeploy."
+      />
+    );
+  }
+
   const { userId } = await auth();
   if (!userId) {
     redirect("/sign-in?redirect_url=/post-job");
