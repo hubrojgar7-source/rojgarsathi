@@ -17,6 +17,7 @@ const columns = [
       { label: "Our Story", href: "/about" },
       { label: "Our Team", href: "/team" },
       { label: "Find Jobs", href: "/#categories" },
+      { label: "Rojgar Hub", href: "/rojgar-hub" },
       { label: "Contact", href: `tel:${SITE_PHONE_TEL}` },
     ],
   },
