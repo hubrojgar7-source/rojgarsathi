@@ -6,13 +6,20 @@ import { usePathname } from "next/navigation";
 import { canManageTeam, roleLabel } from "@/lib/admin/roles";
 import type { StaffRole } from "@/lib/admin/types";
 
-const baseLinks = [
+type AdminNavLink = {
+  href: string;
+  label: string;
+  exact?: boolean;
+  adminOnly?: true;
+};
+
+const baseLinks: AdminNavLink[] = [
   { href: "/admin", label: "Overview", exact: true },
   { href: "/admin/team", label: "Team & roles", adminOnly: true },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/jobs", label: "Jobs" },
   { href: "/admin/reviews", label: "Reviews" },
-] as const;
+];
 
 type Props = {
   role: StaffRole;
