@@ -5,29 +5,50 @@ import { useSyncExternalStore } from "react";
 const STORAGE_KEY = "rojgarsathi_saved_jobs";
 const STORAGE_EVENT = "rojgarsathi_saved_jobs_change";
 
-function readSaved(): string[] {
+let snapshotRaw: string | null | undefined;
+let snapshotCache: string[] = [];
+
+function getSavedSnapshot(): string[] {
+  if (typeof window === "undefined") return snapshotCache;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as string[]) : [];
+    if (raw === snapshotRaw) return snapshotCache;
+    snapshotRaw = raw;
+    snapshotCache = raw ? (JSON.parse(raw) as string[]) : [];
+    return snapshotCache;
   } catch {
-    return [];
+    snapshotRaw = null;
+    snapshotCache = [];
+    return snapshotCache;
   }
 }
 
+function invalidateSnapshot() {
+  snapshotRaw = undefined;
+}
+
 function subscribeSaved(callback: () => void) {
+  const onChange = () => {
+    invalidateSnapshot();
+    callback();
+  };
   const onStorage = (e: StorageEvent) => {
-    if (e.key === STORAGE_KEY || e.key === null) callback();
+    if (e.key === STORAGE_KEY || e.key === null) onChange();
   };
   window.addEventListener("storage", onStorage);
-  window.addEventListener(STORAGE_EVENT, callback);
+  window.addEventListener(STORAGE_EVENT, onChange);
   return () => {
     window.removeEventListener("storage", onStorage);
-    window.removeEventListener(STORAGE_EVENT, callback);
+    window.removeEventListener(STORAGE_EVENT, onChange);
   };
 }
 
 function useSavedJobIds() {
-  return useSyncExternalStore(subscribeSaved, readSaved, () => [] as string[]);
+  return useSyncExternalStore(
+    subscribeSaved,
+    getSavedSnapshot,
+    () => snapshotCache,
+  );
 }
 
 type Props = { jobId: string; className?: string };
@@ -37,11 +58,14 @@ export function JobSaveButton({ jobId, className = "" }: Props) {
   const saved = savedIds.includes(jobId);
 
   function toggle() {
-    const list = readSaved();
+    const list = getSavedSnapshot();
     const next = list.includes(jobId)
       ? list.filter((id) => id !== jobId)
       : [...list, jobId];
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    const raw = JSON.stringify(next);
+    localStorage.setItem(STORAGE_KEY, raw);
+    snapshotRaw = raw;
+    snapshotCache = next;
     window.dispatchEvent(new Event(STORAGE_EVENT));
   }
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 
 import { Header } from "@/components/jobmatrix/Header";
 import { SiteFooter } from "@/components/jobmatrix/SiteFooter";
@@ -10,6 +10,7 @@ import { JobSaveButton } from "@/components/jobs/JobSaveButton";
 import { RelatedJobs } from "@/components/jobs/RelatedJobs";
 import { SkillTags } from "@/components/jobs/SkillTags";
 import { phoneHref, whatsappHref } from "@/lib/jobs/contact";
+import { getCategoryById, resolveCategoryId } from "@/lib/jobs/categories";
 import type { JobRow } from "@/lib/jobs/types";
 import { parseSkills } from "@/lib/jobs/skills";
 
@@ -37,6 +38,11 @@ function postedLabel(iso: string) {
 
 export function JobDetailView({ job, isOwner }: Props) {
   const skillList = parseSkills(job.skills);
+  const categoryLabel =
+    getCategoryById(resolveCategoryId(job.category_id ?? undefined) ?? undefined)
+      ?.name ??
+    skillList[0] ??
+    formatJobType(job.job_type);
   const phone = job.contact_phone?.trim() ?? "";
   const whatsapp = job.contact_whatsapp?.trim() ?? "";
   const tel = phone ? phoneHref(phone) : "";
@@ -76,7 +82,7 @@ export function JobDetailView({ job, isOwner }: Props) {
     },
     {
       label: "Category",
-      value: skillList[0] || formatJobType(job.job_type),
+      value: categoryLabel,
       icon: "tag",
     },
     {
@@ -133,7 +139,7 @@ export function JobDetailView({ job, isOwner }: Props) {
                       {job.is_remote ? " · Remote-friendly" : ""}
                     </DetailRow>
                     <DetailRow icon="tag" label="Category">
-                      {skillList[0] || formatJobType(job.job_type)}
+                      {categoryLabel}
                     </DetailRow>
                     <DetailRow icon="calendar" label="Listed">
                       {postedLabel(job.created_at)}
@@ -233,7 +239,15 @@ export function JobDetailView({ job, isOwner }: Props) {
                 <DeleteJobButton jobId={job.id} jobTitle={job.title} />
               ) : null}
 
-              <RelatedJobs currentJobId={job.id} />
+              <Suspense
+                fallback={
+                  <div className="rounded-xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm">
+                    Loading related jobs…
+                  </div>
+                }
+              >
+                <RelatedJobs currentJobId={job.id} />
+              </Suspense>
 
               {job.company_name ? (
                 <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">

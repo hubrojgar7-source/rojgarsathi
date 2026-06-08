@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 
 import { JobDetailView } from "@/components/jobs/JobDetailView";
 import { getPublishedJobById } from "@/lib/jobs/queries";
+import { isClerkConfigured } from "@/lib/supabase/env";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,8 +22,11 @@ export default async function JobDetailPage({ params }: Props) {
   const job = await getPublishedJobById(id);
   if (!job) notFound();
 
-  const { userId } = await auth();
-  const isOwner = Boolean(userId && userId === job.clerk_user_id);
+  let isOwner = false;
+  if (isClerkConfigured()) {
+    const { userId } = await auth();
+    isOwner = Boolean(userId && userId === job.clerk_user_id);
+  }
 
   return <JobDetailView job={job} isOwner={isOwner} />;
 }

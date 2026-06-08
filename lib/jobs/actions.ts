@@ -139,6 +139,12 @@ export async function createJob(
     .single();
 
   if (jobError) {
+    if (jobError.message.includes("category_id")) {
+      return {
+        error:
+          "Job category could not be saved. Ask the site admin to run the latest Supabase migration (job_category).",
+      };
+    }
     return { error: jobError.message };
   }
 
